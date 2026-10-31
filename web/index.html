@@ -1,1 +1,4674 @@
+<!DOCTYPE html>
+<html lang="tr">
 
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>J.A.R.V.I.S — Hologram 3D Editor</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+
+    margin: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #020609;
+
+    font-family: Arial, sans-serif;
+
+}
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+#camera {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transform: scaleX(-1);
+
+    opacity: 0.12;
+
+    filter:
+        saturate(0.5)
+        brightness(0.7);
+
+}
+
+
+/* =====================================================
+   THREE
+===================================================== */
+
+#three {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 2;
+
+}
+
+
+/* =====================================================
+   HAND CANVAS
+===================================================== */
+
+#handCanvas {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 3;
+
+    pointer-events: none;
+
+    transform: scaleX(-1);
+
+}
+
+
+/* =====================================================
+   MAIN UI
+===================================================== */
+
+#ui {
+
+    position: fixed;
+
+    left: 25px;
+    top: 20px;
+
+    z-index: 20;
+
+    padding: 14px 18px;
+
+    color: #00eaff;
+
+    background:
+        rgba(0,15,25,.82);
+
+    border:
+        1px solid #00eaff;
+
+    box-shadow:
+        0 0 25px
+        rgba(0,234,255,.35);
+
+    backdrop-filter:
+        blur(8px);
+
+}
+
+
+#title {
+
+    font-size: 20px;
+
+    letter-spacing: 4px;
+
+}
+
+
+#mode {
+
+    margin-top: 8px;
+
+    font-size: 13px;
+
+    opacity: .85;
+
+}
+
+
+/* =====================================================
+   INFO
+===================================================== */
+
+#info {
+
+    position: fixed;
+
+    left: 25px;
+    bottom: 20px;
+
+    z-index: 20;
+
+    padding: 10px 15px;
+
+    color: #00eaff;
+
+    background:
+        rgba(0,15,25,.78);
+
+    border-left:
+        3px solid #00eaff;
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+#loading {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 100;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    color: #00eaff;
+
+    background: #020609;
+
+    font-size: 20px;
+
+    letter-spacing: 5px;
+
+}
+
+
+/* =====================================================
+   TOOLBAR
+===================================================== */
+
+#toolbar {
+
+    position: fixed;
+
+    top: 20px;
+    right: 20px;
+
+    width: 270px;
+
+    max-height:
+        calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    z-index: 20;
+
+    padding: 12px;
+
+    color: #00eaff;
+
+    background:
+        rgba(0,15,25,.92);
+
+    border:
+        1px solid #00eaff;
+
+    box-shadow:
+        0 0 25px
+        rgba(0,234,255,.25);
+
+    backdrop-filter:
+        blur(10px);
+
+}
+
+
+/* =====================================================
+   SECTION
+===================================================== */
+
+.section {
+
+    margin-top: 10px;
+
+    margin-bottom: 8px;
+
+    padding-bottom: 7px;
+
+    border-bottom:
+        1px solid
+        rgba(0,234,255,.35);
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+}
+
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+button {
+
+    width: 100%;
+
+    margin-bottom: 6px;
+
+    padding: 9px;
+
+    color: #00eaff;
+
+    background:
+        rgba(0,30,45,.9);
+
+    border:
+        1px solid #00eaff;
+
+    cursor: pointer;
+
+}
+
+
+button:hover {
+
+    background:
+        rgba(0,100,130,.8);
+
+}
+
+
+button.active {
+
+    background:
+        rgba(0,180,220,.35);
+
+    box-shadow:
+        0 0 10px
+        rgba(0,234,255,.4);
+
+}
+
+
+/* =====================================================
+   AXIS CHECKBOX
+===================================================== */
+
+.axis-container {
+
+    display: flex;
+
+    gap: 6px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.axis {
+
+    flex: 1;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    padding: 7px 3px;
+
+    border:
+        1px solid
+        rgba(0,234,255,.45);
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+}
+
+
+.axis input {
+
+    accent-color: #00eaff;
+
+}
+
+
+.axis:has(input:checked) {
+
+    background:
+        rgba(0,180,220,.30);
+
+    box-shadow:
+        0 0 8px
+        rgba(0,234,255,.3);
+
+}
+
+
+/* =====================================================
+   OBJECT LIST
+===================================================== */
+
+#objectList {
+
+    max-height: 150px;
+
+    overflow-y: auto;
+
+}
+
+
+.object-item {
+
+    padding: 7px;
+
+    margin-bottom: 4px;
+
+    font-size: 12px;
+
+    border:
+        1px solid
+        rgba(0,234,255,.25);
+
+    cursor: pointer;
+
+}
+
+
+.object-item:hover {
+
+    background:
+        rgba(0,234,255,.15);
+
+}
+
+
+.object-item.selected {
+
+    background:
+        rgba(0,234,255,.3);
+
+    border-color:
+        #00eaff;
+
+}
+
+
+/* =====================================================
+   FILE
+===================================================== */
+
+input[type=file] {
+
+    display: none;
+
+}
+
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+
+#toolbar::-webkit-scrollbar,
+#objectList::-webkit-scrollbar {
+
+    width: 5px;
+
+}
+
+
+#toolbar::-webkit-scrollbar-thumb,
+#objectList::-webkit-scrollbar-thumb {
+
+    background:
+        #00eaff;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     LOADING
+===================================================== -->
+
+<div id="loading">
+
+    J.A.R.V.I.S BAŞLATILIYOR...
+
+</div>
+
+
+<!-- =====================================================
+     CAMERA
+===================================================== -->
+
+<video
+    id="camera"
+    autoplay
+    playsinline
+></video>
+
+
+<!-- =====================================================
+     HAND
+===================================================== -->
+
+<canvas
+    id="handCanvas"
+></canvas>
+
+
+<!-- =====================================================
+     THREE
+===================================================== -->
+
+<div id="three"></div>
+
+
+<!-- =====================================================
+     UI
+===================================================== -->
+
+<div id="ui">
+
+    <div id="title">
+
+        J.A.R.V.I.S
+
+    </div>
+
+    <div id="mode">
+
+        MODE: MOVE
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     INFO
+===================================================== -->
+
+<div id="info">
+
+    Sistem hazır.
+
+</div>
+
+
+<!-- =====================================================
+     TOOLBAR
+===================================================== -->
+
+<div id="toolbar">
+
+
+    <!-- =================================================
+         CREATE
+    ================================================== -->
+
+    <div class="section">
+
+        MODEL OLUŞTUR
+
+    </div>
+
+
+    <button id="addCube">
+
+        + KÜP
+
+    </button>
+
+
+    <button id="addSphere">
+
+        + KÜRE
+
+    </button>
+
+
+    <button id="addCylinder">
+
+        + SİLİNDİR
+
+    </button>
+
+
+    <button id="addCone">
+
+        + KONİ
+
+    </button>
+
+
+    <button id="addTorus">
+
+        + TORUS
+
+    </button>
+
+
+    <!-- =================================================
+         EDIT MODE
+    ================================================== -->
+
+    <div class="section">
+
+        EDIT MODE
+
+    </div>
+
+
+    <button id="objectModeButton">
+
+        OBJECT MODE
+
+    </button>
+
+
+    <button id="faceModeButton">
+
+        FACE MODE
+
+    </button>
+
+
+    <!-- =================================================
+         TOOL
+    ================================================== -->
+
+    <div class="section">
+
+        TOOL
+
+    </div>
+
+
+    <button
+        id="moveButton"
+        class="active"
+    >
+
+        MOVE
+
+    </button>
+
+
+    <button id="rotateButton">
+
+        ROTATE
+
+    </button>
+
+
+    <button id="scaleButton">
+
+        SCALE
+
+    </button>
+
+
+    <button id="duplicateButton">
+
+        DUPLICATE
+
+    </button>
+
+
+    <button id="deleteButton">
+
+        DELETE
+
+    </button>
+
+
+    <!-- =================================================
+         ROTATION AXES
+    ================================================== -->
+
+    <div class="section">
+
+        ROTATE EKSENLERİ
+
+    </div>
+
+
+    <div class="axis-container">
+
+
+        <label class="axis">
+
+            <input
+                type="checkbox"
+                id="axisX"
+                checked
+            >
+
+            X
+
+        </label>
+
+
+        <label class="axis">
+
+            <input
+                type="checkbox"
+                id="axisY"
+            >
+
+            Y
+
+        </label>
+
+
+        <label class="axis">
+
+            <input
+                type="checkbox"
+                id="axisZ"
+            >
+
+            Z
+
+        </label>
+
+
+    </div>
+
+
+    <!-- =================================================
+         OBJECTS
+    ================================================== -->
+
+    <div class="section">
+
+        OBJECTS
+
+    </div>
+
+
+    <div id="objectList"></div>
+
+
+    <!-- =================================================
+         FILE
+    ================================================== -->
+
+    <div class="section">
+
+        DOSYA
+
+    </div>
+
+
+    <button id="loadButton">
+
+        GLB YÜKLE
+
+    </button>
+
+
+    <button id="exportButton">
+
+        GLB EXPORT
+
+    </button>
+
+
+</div>
+
+
+<!-- =====================================================
+     FILE INPUT
+===================================================== -->
+
+<input
+    type="file"
+    id="glbInput"
+    accept=".glb"
+>
+
+
+<!-- =====================================================
+     IMPORT MAP
+===================================================== -->
+
+<script type="importmap">
+
+{
+
+    "imports": {
+
+        "three":
+            "https://threejs.org/build/three.module.js",
+
+        "three/addons/":
+            "https://threejs.org/examples/jsm/"
+
+    }
+
+}
+
+</script>
+
+
+<!-- =====================================================
+     MEDIAPIPE
+===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<script type="module">
+
+
+/* =====================================================
+   THREE
+===================================================== */
+
+import * as THREE
+from "three";
+
+
+import {
+    GLTFLoader
+}
+from "three/addons/loaders/GLTFLoader.js";
+
+
+import {
+    GLTFExporter
+}
+from "three/addons/exporters/GLTFExporter.js";
+
+
+/* =====================================================
+   HTML
+===================================================== */
+
+const video =
+    document.getElementById("camera");
+
+
+const handCanvas =
+    document.getElementById("handCanvas");
+
+
+const handCtx =
+    handCanvas.getContext("2d");
+
+
+const modeText =
+    document.getElementById("mode");
+
+
+const infoText =
+    document.getElementById("info");
+
+
+const loading =
+    document.getElementById("loading");
+
+
+const objectList =
+    document.getElementById("objectList");
+
+
+const glbInput =
+    document.getElementById("glbInput");
+
+
+/* =====================================================
+   SCENE
+===================================================== */
+
+const scene =
+    new THREE.Scene();
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+const camera3D =
+    new THREE.PerspectiveCamera(
+
+        45,
+
+        window.innerWidth /
+        window.innerHeight,
+
+        0.1,
+
+        1000
+
+    );
+
+
+camera3D.position.set(
+    0,
+    1,
+    8
+);
+
+
+/* =====================================================
+   RENDERER
+===================================================== */
+
+const renderer =
+    new THREE.WebGLRenderer({
+
+        antialias: true,
+
+        alpha: true
+
+    });
+
+
+renderer.setSize(
+
+    window.innerWidth,
+
+    window.innerHeight
+
+);
+
+
+renderer.setPixelRatio(
+
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
+
+);
+
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+
+renderer.shadowMap.enabled =
+    true;
+
+
+document
+    .getElementById("three")
+    .appendChild(
+        renderer.domElement
+    );
+
+
+/* =====================================================
+   LIGHT
+===================================================== */
+
+const light =
+    new THREE.PointLight(
+
+        0x00ffff,
+        30,
+        40
+
+    );
+
+
+light.position.set(
+    0,
+    3,
+    6
+);
+
+
+scene.add(light);
+
+
+const ambient =
+    new THREE.AmbientLight(
+
+        0x004455,
+        3
+
+    );
+
+
+scene.add(ambient);
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+const grid =
+    new THREE.GridHelper(
+
+        20,
+        40,
+
+        0x00eaff,
+        0x003344
+
+    );
+
+
+grid.position.y =
+    -2;
+
+
+scene.add(grid);
+
+
+/* =====================================================
+   HOLOGRAM RING
+===================================================== */
+
+const ring =
+    new THREE.Mesh(
+
+        new THREE.TorusGeometry(
+
+            2,
+            .025,
+            8,
+            100
+
+        ),
+
+        new THREE.MeshBasicMaterial({
+
+            color:
+                0x00eaff,
+
+            transparent:
+                true,
+
+            opacity:
+                .5
+
+        })
+
+    );
+
+
+ring.rotation.x =
+    Math.PI / 2;
+
+
+scene.add(ring);
+
+
+/* =====================================================
+   OBJECT SYSTEM
+===================================================== */
+
+
+/*
+    objects dizisindeki elemanlar:
+
+    Primitive:
+        THREE.Mesh
+
+    GLB:
+        THREE.Group
+
+    Böylece GLB'nin child sistemi bozulmaz.
+*/
+
+let objects = [];
+
+
+let selectedObject =
+    null;
+
+
+let objectCounter =
+    0;
+
+
+let currentTool =
+    "move";
+
+
+let editMode =
+    "object";
+
+
+/* =====================================================
+   FACE SYSTEM
+===================================================== */
+
+let selectedFace =
+    null;
+
+
+/*
+    selectedFace:
+
+    {
+        mesh,
+        faceIndex,
+        overlay
+    }
+*/
+
+
+let faceOverlays =
+    [];
+
+
+/* =====================================================
+   ROTATION AXES
+===================================================== */
+
+const axisX =
+    document.getElementById("axisX");
+
+
+const axisY =
+    document.getElementById("axisY");
+
+
+const axisZ =
+    document.getElementById("axisZ");
+
+
+function getRotationAxes() {
+
+    return {
+
+        x:
+            axisX.checked,
+
+        y:
+            axisY.checked,
+
+        z:
+            axisZ.checked
+
+    };
+
+}
+
+
+/* =====================================================
+   MATERIAL
+===================================================== */
+
+function createHologramMaterial() {
+
+    return new THREE.MeshStandardMaterial({
+
+        color:
+            0x00eaff,
+
+        emissive:
+            0x003344,
+
+        emissiveIntensity:
+            1,
+
+        transparent:
+            true,
+
+        opacity:
+            .78,
+
+        wireframe:
+            true
+
+    });
+
+}
+
+
+/* =====================================================
+   APPLY HOLOGRAM MATERIAL
+===================================================== */
+
+function applyHologramMaterial(root) {
+
+    root.traverse(
+
+        child => {
+
+            if (!child.isMesh) {
+                return;
+            }
+
+
+            child.userData.originalMaterial =
+                child.material;
+
+
+            child.material =
+                createHologramMaterial();
+
+
+            child.material.needsUpdate =
+                true;
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   PREPARE GEOMETRY
+===================================================== */
+
+function prepareGeometry(mesh) {
+
+    if (
+        !mesh ||
+        !mesh.geometry
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+        Face editing için indexed geometry
+        non-indexed hale getiriliyor.
+    */
+
+    if (
+        mesh.geometry.index
+    ) {
+
+        const old =
+            mesh.geometry;
+
+
+        const converted =
+            old.toNonIndexed();
+
+
+        mesh.geometry =
+            converted;
+
+
+        old.dispose();
+
+    }
+
+
+    mesh.geometry.computeVertexNormals();
+
+    mesh.geometry.computeBoundingBox();
+
+    mesh.geometry.computeBoundingSphere();
+
+}
+
+
+/* =====================================================
+   PREPARE ROOT FOR EDITING
+===================================================== */
+
+function prepareRoot(root) {
+
+    root.traverse(
+
+        child => {
+
+            if (
+                child.isMesh
+            ) {
+
+                prepareGeometry(
+                    child
+                );
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   ADD PRIMITIVE
+===================================================== */
+
+function addObject(
+
+    geometry,
+    name
+
+) {
+
+    const mesh =
+        new THREE.Mesh(
+
+            geometry,
+
+            createHologramMaterial()
+
+        );
+
+
+    prepareGeometry(mesh);
+
+
+    objectCounter++;
+
+
+    mesh.name =
+        name +
+        "_" +
+        objectCounter;
+
+
+    mesh.castShadow =
+        true;
+
+
+    mesh.receiveShadow =
+        true;
+
+
+    scene.add(mesh);
+
+
+    objects.push(mesh);
+
+
+    selectObject(mesh);
+
+
+    updateObjectList();
+
+
+    infoText.textContent =
+        mesh.name +
+        " oluşturuldu.";
+
+}
+
+
+/* =====================================================
+   ADD CUBE
+===================================================== */
+
+document
+    .getElementById("addCube")
+    .onclick = () => {
+
+        addObject(
+
+            new THREE.BoxGeometry(
+                1,
+                1,
+                1
+            ),
+
+            "Cube"
+
+        );
+
+    };
+
+
+/* =====================================================
+   ADD SPHERE
+===================================================== */
+
+document
+    .getElementById("addSphere")
+    .onclick = () => {
+
+        addObject(
+
+            new THREE.SphereGeometry(
+
+                .7,
+                24,
+                16
+
+            ),
+
+            "Sphere"
+
+        );
+
+    };
+
+
+/* =====================================================
+   ADD CYLINDER
+===================================================== */
+
+document
+    .getElementById("addCylinder")
+    .onclick = () => {
+
+        addObject(
+
+            new THREE.CylinderGeometry(
+
+                .6,
+                .6,
+                1.5,
+                24
+
+            ),
+
+            "Cylinder"
+
+        );
+
+    };
+
+
+/* =====================================================
+   ADD CONE
+===================================================== */
+
+document
+    .getElementById("addCone")
+    .onclick = () => {
+
+        addObject(
+
+            new THREE.ConeGeometry(
+
+                .7,
+                1.5,
+                24
+
+            ),
+
+            "Cone"
+
+        );
+
+    };
+
+
+/* =====================================================
+   ADD TORUS
+===================================================== */
+
+document
+    .getElementById("addTorus")
+    .onclick = () => {
+
+        addObject(
+
+            new THREE.TorusGeometry(
+
+                .7,
+                .25,
+                16,
+                32
+
+            ),
+
+            "Torus"
+
+        );
+
+    };
+
+
+/* =====================================================
+   SELECT OBJECT
+===================================================== */
+
+function selectObject(object) {
+
+    if (!object) {
+        return;
+    }
+
+
+    selectedObject =
+        object;
+
+
+    objects.forEach(
+
+        root => {
+
+            root.traverse(
+
+                child => {
+
+                    if (
+                        child.isMesh &&
+                        child.material &&
+                        child.material.emissive
+                    ) {
+
+                        child.material.emissive.set(
+                            0x003344
+                        );
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    );
+
+
+    object.traverse(
+
+        child => {
+
+            if (
+                child.isMesh &&
+                child.material &&
+                child.material.emissive
+            ) {
+
+                child.material.emissive.set(
+                    0x00ffff
+                );
+
+            }
+
+        }
+
+    );
+
+
+    updateObjectList();
+
+}
+
+
+/* =====================================================
+   OBJECT LIST
+===================================================== */
+
+function updateObjectList() {
+
+    objectList.innerHTML =
+        "";
+
+
+    objects.forEach(
+
+        object => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "object-item";
+
+
+            if (
+                object === selectedObject
+            ) {
+
+                item.classList.add(
+                    "selected"
+                );
+
+            }
+
+
+            item.textContent =
+                object.name ||
+                "Unnamed";
+
+
+            item.onclick =
+                () => {
+
+                    enterObjectMode();
+
+                    selectObject(
+                        object
+                    );
+
+                };
+
+
+            objectList.appendChild(
+                item
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   TOOL
+===================================================== */
+
+function setTool(tool) {
+
+    currentTool =
+        tool;
+
+
+    document
+        .getElementById("moveButton")
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById("rotateButton")
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById("scaleButton")
+        .classList.remove(
+            "active"
+        );
+
+
+    if (
+        tool === "move"
+    ) {
+
+        document
+            .getElementById("moveButton")
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    if (
+        tool === "rotate"
+    ) {
+
+        document
+            .getElementById("rotateButton")
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    if (
+        tool === "scale"
+    ) {
+
+        document
+            .getElementById("scaleButton")
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    updateModeText();
+
+}
+
+
+/* =====================================================
+   MODE TEXT
+===================================================== */
+
+function updateModeText() {
+
+    if (
+        editMode === "face"
+    ) {
+
+        modeText.textContent =
+            "FACE: " +
+            currentTool.toUpperCase();
+
+    }
+
+    else {
+
+        modeText.textContent =
+            "MODE: " +
+            currentTool.toUpperCase();
+
+    }
+
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document
+    .getElementById("moveButton")
+    .onclick =
+        () => setTool("move");
+
+
+document
+    .getElementById("rotateButton")
+    .onclick =
+        () => setTool("rotate");
+
+
+document
+    .getElementById("scaleButton")
+    .onclick =
+        () => setTool("scale");
+
+
+/* =====================================================
+   OBJECT MODE
+===================================================== */
+
+function enterObjectMode() {
+
+    editMode =
+        "object";
+
+
+    selectedFace =
+        null;
+
+
+    clearFaceOverlays();
+
+
+    updateModeText();
+
+
+    infoText.textContent =
+        "OBJECT MODE";
+
+}
+
+
+document
+    .getElementById("objectModeButton")
+    .onclick =
+        enterObjectMode;
+
+
+/* =====================================================
+   GET ALL MESHES
+===================================================== */
+
+function getMeshes(root) {
+
+    const meshes = [];
+
+
+    if (
+        root &&
+        root.isMesh
+    ) {
+
+        meshes.push(root);
+
+        return meshes;
+
+    }
+
+
+    if (
+        root &&
+        root.traverse
+    ) {
+
+        root.traverse(
+
+            child => {
+
+                if (
+                    child.isMesh
+                ) {
+
+                    meshes.push(child);
+
+                }
+
+            }
+
+        );
+
+    }
+
+
+    return meshes;
+
+}
+
+
+/* =====================================================
+   FACE MODE
+===================================================== */
+
+function enterFaceMode() {
+
+    if (!selectedObject) {
+
+        infoText.textContent =
+            "Önce obje seç.";
+
+        return;
+
+    }
+
+
+    prepareRoot(
+        selectedObject
+    );
+
+
+    editMode =
+        "face";
+
+
+    selectedFace =
+        null;
+
+
+    createFaceOverlays(
+        selectedObject
+    );
+
+
+    updateModeText();
+
+
+    infoText.textContent =
+        "Bir yüz seç.";
+
+}
+
+
+document
+    .getElementById("faceModeButton")
+    .onclick =
+        enterFaceMode;
+
+
+/* =====================================================
+   FACE OVERLAYS
+===================================================== */
+
+function createFaceOverlays(root) {
+
+    clearFaceOverlays();
+
+
+    const meshes =
+        getMeshes(root);
+
+
+    meshes.forEach(
+
+        mesh => {
+
+            const geometry =
+                mesh.geometry;
+
+
+            if (!geometry) {
+                return;
+            }
+
+
+            const position =
+                geometry.attributes.position;
+
+
+            if (!position) {
+                return;
+            }
+
+
+            const faceCount =
+                Math.floor(
+                    position.count / 3
+                );
+
+
+            for (
+                let faceIndex = 0;
+                faceIndex < faceCount;
+                faceIndex++
+            ) {
+
+                const vertices = [];
+
+
+                const start =
+                    faceIndex * 3;
+
+
+                for (
+                    let j = 0;
+                    j < 3;
+                    j++
+                ) {
+
+                    const i =
+                        start + j;
+
+
+                    vertices.push(
+
+                        position.getX(i),
+                        position.getY(i),
+                        position.getZ(i)
+
+                    );
+
+                }
+
+
+                const faceGeometry =
+                    new THREE.BufferGeometry();
+
+
+                faceGeometry.setAttribute(
+
+                    "position",
+
+                    new THREE.Float32BufferAttribute(
+
+                        vertices,
+                        3
+
+                    )
+
+                );
+
+
+                const material =
+                    new THREE.MeshBasicMaterial({
+
+                        color:
+                            0x00eaff,
+
+                        transparent:
+                            true,
+
+                        opacity:
+                            .08,
+
+                        side:
+                            THREE.DoubleSide,
+
+                        depthWrite:
+                            false
+
+                    });
+
+
+                const overlay =
+                    new THREE.Mesh(
+
+                        faceGeometry,
+                        material
+
+                    );
+
+
+                overlay.userData.mesh =
+                    mesh;
+
+
+                overlay.userData.faceIndex =
+                    faceIndex;
+
+
+                scene.add(
+                    overlay
+                );
+
+
+                faceOverlays.push(
+                    overlay
+                );
+
+            }
+
+        }
+
+    );
+
+
+    updateFaceOverlays();
+
+}
+
+
+/* =====================================================
+   CLEAR OVERLAYS
+===================================================== */
+
+function clearFaceOverlays() {
+
+    faceOverlays.forEach(
+
+        overlay => {
+
+            scene.remove(
+                overlay
+            );
+
+
+            if (
+                overlay.geometry
+            ) {
+
+                overlay.geometry.dispose();
+
+            }
+
+
+            if (
+                overlay.material
+            ) {
+
+                overlay.material.dispose();
+
+            }
+
+        }
+
+    );
+
+
+    faceOverlays = [];
+
+}
+
+
+/* =====================================================
+   SELECT FACE
+===================================================== */
+
+function selectFace(overlay) {
+
+    if (
+        selectedFace &&
+        selectedFace.overlay
+    ) {
+
+        selectedFace.overlay.material.color.set(
+            0x00eaff
+        );
+
+
+        selectedFace.overlay.material.opacity =
+            .08;
+
+    }
+
+
+    selectedFace = {
+
+        mesh:
+            overlay.userData.mesh,
+
+        faceIndex:
+            overlay.userData.faceIndex,
+
+        overlay:
+            overlay
+
+    };
+
+
+    overlay.material.color.set(
+        0xffffff
+    );
+
+
+    overlay.material.opacity =
+        .65;
+
+
+    infoText.textContent =
+
+        "FACE " +
+        overlay.userData.faceIndex +
+        " SEÇİLDİ.";
+
+}
+
+
+/* =====================================================
+   UPDATE FACE OVERLAYS
+===================================================== */
+
+function updateFaceOverlays() {
+
+    faceOverlays.forEach(
+
+        overlay => {
+
+            const mesh =
+                overlay.userData.mesh;
+
+
+            if (
+                !mesh ||
+                !mesh.geometry
+            ) {
+
+                return;
+
+            }
+
+
+            const position =
+                mesh.geometry.attributes.position;
+
+
+            const faceIndex =
+                overlay.userData.faceIndex;
+
+
+            const start =
+                faceIndex * 3;
+
+
+            if (
+                start + 2 >=
+                position.count
+            ) {
+
+                return;
+
+            }
+
+
+            const overlayPosition =
+                overlay.geometry.attributes.position;
+
+
+            for (
+                let j = 0;
+                j < 3;
+                j++
+            ) {
+
+                const source =
+                    start + j;
+
+
+                overlayPosition.setXYZ(
+
+                    j,
+
+                    position.getX(source),
+                    position.getY(source),
+                    position.getZ(source)
+
+                );
+
+            }
+
+
+            overlayPosition.needsUpdate =
+                true;
+
+
+            overlay.geometry
+                .computeBoundingSphere();
+
+
+            /*
+                Mesh'in LOCAL geometry'si
+                kullanıldığı için overlay
+                mesh'in world transformunu
+                birebir takip eder.
+            */
+
+            mesh.updateWorldMatrix(
+                true,
+                false
+            );
+
+
+            const worldMatrix =
+                mesh.matrixWorld;
+
+
+            overlay.matrixAutoUpdate =
+                false;
+
+
+            overlay.matrix.copy(
+                worldMatrix
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   FACE TRANSFORM
+===================================================== */
+
+function transformFace(
+
+    mesh,
+    faceIndex,
+    operation,
+    dx,
+    dy
+
+) {
+
+    if (
+        !mesh ||
+        !mesh.geometry
+    ) {
+
+        return;
+
+    }
+
+
+    const position =
+        mesh.geometry.attributes.position;
+
+
+    if (!position) {
+        return;
+    }
+
+
+    const start =
+        faceIndex * 3;
+
+
+    if (
+        start + 2 >=
+        position.count
+    ) {
+
+        return;
+
+    }
+
+
+    /* =================================================
+       CENTER
+    ================================================= */
+
+    const center =
+        new THREE.Vector3();
+
+
+    for (
+        let i = 0;
+        i < 3;
+        i++
+    ) {
+
+        const index =
+            start + i;
+
+
+        center.x +=
+            position.getX(index);
+
+
+        center.y +=
+            position.getY(index);
+
+
+        center.z +=
+            position.getZ(index);
+
+    }
+
+
+    center.divideScalar(3);
+
+
+    /* =================================================
+       MOVE
+    ================================================= */
+
+    if (
+        operation === "move"
+    ) {
+
+        for (
+            let i = 0;
+            i < 3;
+            i++
+        ) {
+
+            const index =
+                start + i;
+
+
+            position.setXYZ(
+
+                index,
+
+                position.getX(index) + dx,
+
+                position.getY(index) + dy,
+
+                position.getZ(index)
+
+            );
+
+        }
+
+    }
+
+
+    /* =================================================
+       ROTATE
+    ================================================= */
+
+    if (
+        operation === "rotate"
+    ) {
+
+        const axes =
+            getRotationAxes();
+
+
+        const quaternion =
+            new THREE.Quaternion();
+
+
+        if (axes.x) {
+
+            const qx =
+                new THREE.Quaternion()
+                    .setFromAxisAngle(
+
+                        new THREE.Vector3(
+                            1,
+                            0,
+                            0
+                        ),
+
+                        dy
+
+                    );
+
+
+            quaternion.multiply(
+                qx
+            );
+
+        }
+
+
+        if (axes.y) {
+
+            const qy =
+                new THREE.Quaternion()
+                    .setFromAxisAngle(
+
+                        new THREE.Vector3(
+                            0,
+                            1,
+                            0
+                        ),
+
+                        dx
+
+                    );
+
+
+            quaternion.multiply(
+                qy
+            );
+
+        }
+
+
+        if (axes.z) {
+
+            const qz =
+                new THREE.Quaternion()
+                    .setFromAxisAngle(
+
+                        new THREE.Vector3(
+                            0,
+                            0,
+                            1
+                        ),
+
+                        dx
+
+                    );
+
+
+            quaternion.multiply(
+                qz
+            );
+
+        }
+
+
+        for (
+            let i = 0;
+            i < 3;
+            i++
+        ) {
+
+            const index =
+                start + i;
+
+
+            const vertex =
+                new THREE.Vector3(
+
+                    position.getX(index),
+                    position.getY(index),
+                    position.getZ(index)
+
+                );
+
+
+            vertex.sub(
+                center
+            );
+
+
+            vertex.applyQuaternion(
+                quaternion
+            );
+
+
+            vertex.add(
+                center
+            );
+
+
+            position.setXYZ(
+
+                index,
+
+                vertex.x,
+                vertex.y,
+                vertex.z
+
+            );
+
+        }
+
+    }
+
+
+    /* =================================================
+       SCALE
+    ================================================= */
+
+    if (
+        operation === "scale"
+    ) {
+
+        const factor =
+            THREE.MathUtils.clamp(
+
+                1 + dx,
+
+                .1,
+                5
+
+            );
+
+
+        for (
+            let i = 0;
+            i < 3;
+            i++
+        ) {
+
+            const index =
+                start + i;
+
+
+            const vertex =
+                new THREE.Vector3(
+
+                    position.getX(index),
+                    position.getY(index),
+                    position.getZ(index)
+
+                );
+
+
+            vertex.sub(
+                center
+            );
+
+
+            vertex.multiplyScalar(
+                factor
+            );
+
+
+            vertex.add(
+                center
+            );
+
+
+            position.setXYZ(
+
+                index,
+
+                vertex.x,
+                vertex.y,
+                vertex.z
+
+            );
+
+        }
+
+    }
+
+
+    position.needsUpdate =
+        true;
+
+
+    mesh.geometry.computeVertexNormals();
+
+    mesh.geometry.computeBoundingBox();
+
+    mesh.geometry.computeBoundingSphere();
+
+
+    updateFaceOverlays();
+
+}
+
+
+/* =====================================================
+   RAYCAST
+===================================================== */
+
+const raycaster =
+    new THREE.Raycaster();
+
+
+const mouse =
+    new THREE.Vector2();
+
+
+renderer.domElement.addEventListener(
+
+    "pointerdown",
+
+    event => {
+
+        mouse.x =
+            (event.clientX /
+            window.innerWidth) *
+            2 - 1;
+
+
+        mouse.y =
+            -(event.clientY /
+            window.innerHeight) *
+            2 + 1;
+
+
+        raycaster.setFromCamera(
+
+            mouse,
+
+            camera3D
+
+        );
+
+
+        /* =============================================
+           FACE MODE
+        ============================================= */
+
+        if (
+            editMode === "face"
+        ) {
+
+            const hits =
+                raycaster.intersectObjects(
+
+                    faceOverlays,
+
+                    true
+
+                );
+
+
+            if (
+                hits.length
+            ) {
+
+                selectFace(
+                    hits[0].object
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        /* =============================================
+           OBJECT MODE
+        ============================================= */
+
+        const hits =
+            raycaster.intersectObjects(
+
+                objects,
+
+                true
+
+            );
+
+
+        if (
+            hits.length
+        ) {
+
+            let object =
+                hits[0].object;
+
+
+            while (
+                object.parent &&
+                !objects.includes(object)
+            ) {
+
+                object =
+                    object.parent;
+
+            }
+
+
+            if (
+                objects.includes(object)
+            ) {
+
+                selectObject(
+                    object
+                );
+
+            }
+
+        }
+
+    }
+
+);
+
+
+/* =====================================================
+   DUPLICATE
+===================================================== */
+
+document
+    .getElementById("duplicateButton")
+    .onclick = () => {
+
+        if (!selectedObject) {
+
+            infoText.textContent =
+                "Önce obje seç.";
+
+            return;
+
+        }
+
+
+        const clone =
+            selectedObject.clone(true);
+
+
+        /*
+            GLB clone'larında geometry ve
+            material paylaşımını engelliyoruz.
+        */
+
+        clone.traverse(
+
+            child => {
+
+                if (
+                    child.isMesh
+                ) {
+
+                    if (
+                        child.geometry
+                    ) {
+
+                        child.geometry =
+                            child.geometry.clone();
+
+                    }
+
+
+                    if (
+                        child.material
+                    ) {
+
+                        child.material =
+                            child.material.clone();
+
+                    }
+
+                }
+
+            }
+
+        );
+
+
+        objectCounter++;
+
+
+        clone.name =
+
+            (
+                selectedObject.name ||
+                "Object"
+            ) +
+
+            "_COPY_" +
+
+            objectCounter;
+
+
+        clone.position.x +=
+            .5;
+
+
+        clone.position.z +=
+            .5;
+
+
+        scene.add(
+            clone
+        );
+
+
+        objects.push(
+            clone
+        );
+
+
+        selectObject(
+            clone
+        );
+
+
+        updateObjectList();
+
+
+        infoText.textContent =
+            "Obje kopyalandı.";
+
+    };
+
+
+/* =====================================================
+   DELETE OBJECT
+===================================================== */
+
+document
+    .getElementById("deleteButton")
+    .onclick = () => {
+
+
+        /* =============================================
+           DELETE FACE
+        ============================================= */
+
+        if (
+
+            editMode === "face" &&
+
+            selectedFace &&
+
+            selectedFace.mesh
+
+        ) {
+
+            deleteFace(
+
+                selectedFace.mesh,
+
+                selectedFace.faceIndex
+
+            );
+
+
+            selectedFace =
+                null;
+
+
+            createFaceOverlays(
+                selectedObject
+            );
+
+
+            infoText.textContent =
+                "Gerçek face silindi.";
+
+
+            return;
+
+        }
+
+
+        /* =============================================
+           DELETE OBJECT
+        ============================================= */
+
+        if (!selectedObject) {
+
+            infoText.textContent =
+                "Önce obje seç.";
+
+            return;
+
+        }
+
+
+        disposeObject(
+            selectedObject
+        );
+
+
+        scene.remove(
+            selectedObject
+        );
+
+
+        objects =
+            objects.filter(
+
+                object =>
+                    object !==
+                    selectedObject
+
+            );
+
+
+        selectedObject =
+            null;
+
+
+        clearFaceOverlays();
+
+
+        updateObjectList();
+
+
+        infoText.textContent =
+            "Obje silindi.";
+
+    };
+
+
+/* =====================================================
+   DISPOSE OBJECT
+===================================================== */
+
+function disposeObject(root) {
+
+    root.traverse(
+
+        child => {
+
+            if (
+                child.isMesh
+            ) {
+
+                if (
+                    child.geometry
+                ) {
+
+                    child.geometry.dispose();
+
+                }
+
+
+                if (
+                    child.material
+                ) {
+
+                    if (
+                        Array.isArray(
+                            child.material
+                        )
+                    ) {
+
+                        child.material.forEach(
+
+                            material => {
+
+                                material.dispose();
+
+                            }
+
+                        );
+
+                    }
+
+                    else {
+
+                        child.material.dispose();
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   DELETE FACE
+===================================================== */
+
+function deleteFace(
+
+    mesh,
+    faceIndex
+
+) {
+
+    if (
+        !mesh ||
+        !mesh.geometry
+    ) {
+
+        return;
+
+    }
+
+
+    const geometry =
+        mesh.geometry;
+
+
+    const oldPosition =
+        geometry.attributes.position;
+
+
+    const oldNormal =
+        geometry.attributes.normal;
+
+
+    const oldUV =
+        geometry.attributes.uv;
+
+
+    if (!oldPosition) {
+        return;
+    }
+
+
+    const faceCount =
+        Math.floor(
+            oldPosition.count / 3
+        );
+
+
+    if (
+        faceIndex < 0 ||
+        faceIndex >= faceCount
+    ) {
+
+        return;
+
+    }
+
+
+    const positions = [];
+
+    const uvs = [];
+
+
+    for (
+        let f = 0;
+        f < faceCount;
+        f++
+    ) {
+
+        if (
+            f === faceIndex
+        ) {
+
+            continue;
+
+        }
+
+
+        for (
+            let j = 0;
+            j < 3;
+            j++
+        ) {
+
+            const i =
+                f * 3 + j;
+
+
+            positions.push(
+
+                oldPosition.getX(i),
+                oldPosition.getY(i),
+                oldPosition.getZ(i)
+
+            );
+
+
+            if (oldUV) {
+
+                uvs.push(
+
+                    oldUV.getX(i),
+                    oldUV.getY(i)
+
+                );
+
+            }
+
+        }
+
+    }
+
+
+    const newGeometry =
+        new THREE.BufferGeometry();
+
+
+    newGeometry.setAttribute(
+
+        "position",
+
+        new THREE.Float32BufferAttribute(
+
+            positions,
+            3
+
+        )
+
+    );
+
+
+    if (
+        uvs.length
+    ) {
+
+        newGeometry.setAttribute(
+
+            "uv",
+
+            new THREE.Float32BufferAttribute(
+
+                uvs,
+                2
+
+            )
+
+        );
+
+    }
+
+
+    newGeometry.computeVertexNormals();
+
+    newGeometry.computeBoundingBox();
+
+    newGeometry.computeBoundingSphere();
+
+
+    geometry.dispose();
+
+
+    mesh.geometry =
+        newGeometry;
+
+}
+
+
+/* =====================================================
+   GLB LOADER
+===================================================== */
+
+const gltfLoader =
+    new GLTFLoader();
+
+
+document
+    .getElementById("loadButton")
+    .onclick = () => {
+
+        glbInput.click();
+
+    };
+
+
+/* =====================================================
+   GLB LOAD
+===================================================== */
+
+glbInput.addEventListener(
+
+    "change",
+
+    event => {
+
+        const file =
+            event.target.files[0];
+
+
+        if (!file) {
+            return;
+        }
+
+
+        if (
+            !file.name
+                .toLowerCase()
+                .endsWith(".glb")
+        ) {
+
+            infoText.textContent =
+                "SADECE GLB.";
+
+            return;
+
+        }
+
+
+        infoText.textContent =
+            "GLB yükleniyor...";
+
+
+        const url =
+            URL.createObjectURL(
+                file
+            );
+
+
+        gltfLoader.load(
+
+            url,
+
+
+            /* =========================================
+               SUCCESS
+            ========================================== */
+
+            gltf => {
+
+                console.log(
+                    "GLB başarıyla yüklendi.",
+                    gltf
+                );
+
+
+                /*
+                    ESKİ KODDAKİ EN BÜYÜK PROBLEM:
+
+                    gltf.scene.traverse(...)
+                    ile child meshleri doğrudan
+                    scene'e taşıyorduk.
+
+                    BU YAPILMAYACAK.
+
+                    gltf.scene olduğu gibi korunacak.
+                */
+
+                const root =
+                    gltf.scene;
+
+
+                objectCounter++;
+
+
+                root.name =
+
+                    (
+                        file.name
+                            .replace(
+                                /\.glb$/i,
+                                ""
+                            )
+                    ) +
+
+                    "_" +
+
+                    objectCounter;
+
+
+                /*
+                    GLB'nin kendi hierarchy'si korunuyor.
+                */
+
+                prepareRoot(
+                    root
+                );
+
+
+                /*
+                    Hologram görünümü.
+                */
+
+                root.traverse(
+
+                    child => {
+
+                        if (
+                            !child.isMesh
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        /*
+                            Orijinal materyali sakla.
+                        */
+
+                        child.userData.originalMaterial =
+                            child.material;
+
+
+                        /*
+                            Hologram materyali.
+                        */
+
+                        child.material =
+                            createHologramMaterial();
+
+
+                        child.material.needsUpdate =
+                            true;
+
+                    }
+
+                );
+
+
+                /*
+                    Modeli sahneye tek obje olarak
+                    ekliyoruz.
+                */
+
+                scene.add(
+                    root
+                );
+
+
+                objects.push(
+                    root
+                );
+
+
+                selectObject(
+                    root
+                );
+
+
+                updateObjectList();
+
+
+                infoText.textContent =
+                    "GLB yüklendi. Hierarchy korundu.";
+
+
+                console.log(
+                    "GLB root:",
+                    root
+                );
+
+
+                console.log(
+                    "Mesh sayısı:",
+                    getMeshes(root).length
+                );
+
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+
+                /*
+                    Input'u temizle.
+                    Aynı dosyanın tekrar seçilebilmesini sağlar.
+                */
+
+                glbInput.value =
+                    "";
+
+            },
+
+
+            /* =========================================
+               PROGRESS
+            ========================================== */
+
+            progress => {
+
+                if (
+                    progress.total
+                ) {
+
+                    const percent =
+                        Math.round(
+
+                            progress.loaded /
+                            progress.total *
+                            100
+
+                        );
+
+
+                    infoText.textContent =
+
+                        "GLB YÜKLENİYOR... " +
+                        percent +
+                        "%";
+
+                }
+
+            },
+
+
+            /* =========================================
+               ERROR
+            ========================================== */
+
+            error => {
+
+                console.error(
+                    "GLB ERROR:",
+                    error
+                );
+
+
+                infoText.textContent =
+                    "GLB yüklenemedi.";
+
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+
+                glbInput.value =
+                    "";
+
+            }
+
+        );
+
+    }
+
+);
+
+
+/* =====================================================
+   EXPORT
+===================================================== */
+
+document
+    .getElementById("exportButton")
+    .onclick = () => {
+
+        if (
+            !objects.length
+        ) {
+
+            infoText.textContent =
+                "Export edilecek model yok.";
+
+            return;
+
+        }
+
+
+        infoText.textContent =
+            "GLB export hazırlanıyor...";
+
+
+        /*
+            Yeni scene.
+        */
+
+        const exportScene =
+            new THREE.Scene();
+
+
+        /*
+            Her root'u clone ediyoruz.
+
+            Böylece GLB hierarchy korunur.
+        */
+
+        objects.forEach(
+
+            object => {
+
+                const clone =
+                    object.clone(
+                        true
+                    );
+
+
+                /*
+                    Geometryleri bağımsızlaştır.
+                */
+
+                clone.traverse(
+
+                    child => {
+
+                        if (
+                            !child.isMesh
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        if (
+                            child.geometry
+                        ) {
+
+                            child.geometry =
+                                child.geometry.clone();
+
+                        }
+
+
+                        /*
+                            Export'ta hologram
+                            wireframe kullanılmayacak.
+                        */
+
+                        const original =
+                            child.userData
+                                .originalMaterial;
+
+
+                        if (
+                            original
+                        ) {
+
+                            child.material =
+                                cloneMaterial(
+                                    original
+                                );
+
+                        }
+
+                        else {
+
+                            /*
+                                Fallback.
+                            */
+
+                            child.material =
+                                new THREE.MeshStandardMaterial({
+
+                                    color:
+                                        0x00eaff,
+
+                                    metalness:
+                                        .15,
+
+                                    roughness:
+                                        .55
+
+                                });
+
+                        }
+
+
+                        child.material.wireframe =
+                            false;
+
+
+                        child.material.transparent =
+                            false;
+
+
+                        child.material.opacity =
+                            1;
+
+                    }
+
+                );
+
+
+                exportScene.add(
+                    clone
+                );
+
+            }
+
+        );
+
+
+        /*
+            Exporter.
+        */
+
+        const exporter =
+            new GLTFExporter();
+
+
+        exporter.parse(
+
+            exportScene,
+
+
+            result => {
+
+                let blob;
+
+
+                if (
+                    result instanceof ArrayBuffer
+                ) {
+
+                    blob =
+                        new Blob(
+
+                            [result],
+
+                            {
+                                type:
+                                    "model/gltf-binary"
+                            }
+
+                        );
+
+                }
+
+                else {
+
+                    /*
+                        Normalde binary:true
+                        ile buraya gelmez.
+
+                        Güvenlik için.
+                    */
+
+                    blob =
+                        new Blob(
+
+                            [
+                                JSON.stringify(
+                                    result
+                                )
+                            ],
+
+                            {
+                                type:
+                                    "application/json"
+                            }
+
+                        );
+
+                }
+
+
+                const downloadURL =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+
+                link.href =
+                    downloadURL;
+
+
+                link.download =
+                    "JARVIS_MODEL.glb";
+
+
+                document.body.appendChild(
+                    link
+                );
+
+
+                link.click();
+
+
+                document.body.removeChild(
+                    link
+                );
+
+
+                setTimeout(
+
+                    () => {
+
+                        URL.revokeObjectURL(
+                            downloadURL
+                        );
+
+                    },
+
+                    1000
+
+                );
+
+
+                infoText.textContent =
+                    "GLB export tamamlandı.";
+
+            },
+
+
+            error => {
+
+                console.error(
+                    "EXPORT ERROR:",
+                    error
+                );
+
+
+                infoText.textContent =
+                    "GLB export hatası.";
+
+            },
+
+
+            {
+
+                binary:
+                    true
+
+            }
+
+        );
+
+    };
+
+
+/* =====================================================
+   MATERIAL CLONE
+===================================================== */
+
+function cloneMaterial(material) {
+
+    if (
+        Array.isArray(material)
+    ) {
+
+        return material.map(
+            cloneMaterial
+        );
+
+    }
+
+
+    if (
+        !material
+    ) {
+
+        return new THREE.MeshStandardMaterial({
+
+            color:
+                0x00eaff
+
+        });
+
+    }
+
+
+    const cloned =
+        material.clone();
+
+
+    cloned.wireframe =
+        false;
+
+
+    cloned.transparent =
+        false;
+
+
+    cloned.opacity =
+        1;
+
+
+    return cloned;
+
+}
+
+
+/* =====================================================
+   HAND DISTANCE
+===================================================== */
+
+function distance(a, b) {
+
+    const dx =
+        a.x - b.x;
+
+
+    const dy =
+        a.y - b.y;
+
+
+    return Math.sqrt(
+
+        dx * dx +
+        dy * dy
+
+    );
+
+}
+
+
+/* =====================================================
+   FINGER
+===================================================== */
+
+function fingerExtended(
+
+    landmarks,
+    tip,
+    pip
+
+) {
+
+    return (
+
+        landmarks[tip].y <
+        landmarks[pip].y
+
+    );
+
+}
+
+
+/* =====================================================
+   MEDIAPIPE
+===================================================== */
+
+const hands =
+    new Hands({
+
+        locateFile:
+            file => {
+
+                return (
+
+                    "https://cdn.jsdelivr.net/npm/" +
+                    "@mediapipe/hands/" +
+                    file
+
+                );
+
+            }
+
+    });
+
+
+/*
+    TEK EL
+*/
+
+hands.setOptions({
+
+    maxNumHands:
+        1,
+
+    modelComplexity:
+        1,
+
+    minDetectionConfidence:
+        .7,
+
+    minTrackingConfidence:
+        .7
+
+});
+
+
+/* =====================================================
+   HAND RESULTS
+===================================================== */
+
+hands.onResults(
+
+    results => {
+
+        /*
+            Canvas.
+        */
+
+        if (
+
+            video.videoWidth &&
+            video.videoHeight
+
+        ) {
+
+            handCanvas.width =
+                video.videoWidth;
+
+
+            handCanvas.height =
+                video.videoHeight;
+
+        }
+
+
+        handCtx.clearRect(
+
+            0,
+            0,
+            handCanvas.width,
+            handCanvas.height
+
+        );
+
+
+        /*
+            El yok.
+        */
+
+        if (
+
+            !results.multiHandLandmarks ||
+
+            !results.multiHandLandmarks.length
+
+        ) {
+
+            return;
+
+        }
+
+
+        const hand =
+            results.multiHandLandmarks[0];
+
+
+        /*
+            El çizimi.
+        */
+
+        drawConnectors(
+
+            handCtx,
+
+            hand,
+
+            HAND_CONNECTIONS,
+
+            {
+
+                color:
+                    "#00eaff",
+
+                lineWidth:
+                    3
+
+            }
+
+        );
+
+
+        drawLandmarks(
+
+            handCtx,
+
+            hand,
+
+            {
+
+                color:
+                    "#ffffff",
+
+                lineWidth:
+                    1,
+
+                radius:
+                    5
+
+            }
+
+        );
+
+
+        /* =================================================
+           PINCH
+        ================================================= */
+
+        const pinch =
+            distance(
+
+                hand[4],
+                hand[8]
+
+            );
+
+
+        const isPinch =
+            pinch < .07;
+
+
+        /* =================================================
+           FINGERS
+        ================================================= */
+
+        const index =
+            fingerExtended(
+
+                hand,
+                8,
+                6
+
+            );
+
+
+        const middle =
+            fingerExtended(
+
+                hand,
+                12,
+                10
+
+            );
+
+
+        const ringFinger =
+            fingerExtended(
+
+                hand,
+                16,
+                14
+
+            );
+
+
+        const pinky =
+            fingerExtended(
+
+                hand,
+                20,
+                18
+
+            );
+
+
+        /* =================================================
+           WOLF
+        ================================================= */
+
+        const wolf =
+
+            index &&
+            !middle &&
+            !ringFinger &&
+            pinky;
+
+
+        /* =================================================
+           OBJECT MODE
+        ================================================= */
+
+        if (
+
+            editMode === "object" &&
+            selectedObject
+
+        ) {
+
+
+            /* =============================================
+               MOVE
+            ============================================== */
+
+            if (
+
+                currentTool === "move" &&
+                isPinch &&
+                !wolf
+
+            ) {
+
+                selectedObject.position.x =
+
+                    (0.5 - hand[8].x) *
+                    6;
+
+
+                selectedObject.position.y =
+
+                    (0.5 - hand[8].y) *
+                    4;
+
+
+                updateModeText();
+
+
+                infoText.textContent =
+                    "PINCH → MODEL TAŞINIYOR";
+
+            }
+
+
+            /* =============================================
+               ROTATE
+            ============================================== */
+
+            else if (
+
+                currentTool === "rotate" &&
+                wolf
+
+            ) {
+
+                const axes =
+                    getRotationAxes();
+
+
+                const dx =
+                    (0.5 - hand[8].x) *
+                    .12;
+
+
+                const dy =
+                    (0.5 - hand[8].y) *
+                    .12;
+
+
+                /*
+                    X
+                    El yukarı-aşağı.
+                */
+
+                if (
+                    axes.x
+                ) {
+
+                    selectedObject.rotation.x +=
+                        dy;
+
+                }
+
+
+                /*
+                    Y
+                    El sağa-sola.
+                */
+
+                if (
+                    axes.y
+                ) {
+
+                    selectedObject.rotation.y +=
+                        dx;
+
+                }
+
+
+                /*
+                    Z
+                    İki hareketin ortalamasından
+                    kontrollü dönüş.
+                */
+
+                if (
+                    axes.z
+                ) {
+
+                    selectedObject.rotation.z +=
+                        dx;
+
+                }
+
+
+                updateModeText();
+
+
+                const activeAxes = [];
+
+
+                if (axes.x)
+                    activeAxes.push("X");
+
+
+                if (axes.y)
+                    activeAxes.push("Y");
+
+
+                if (axes.z)
+                    activeAxes.push("Z");
+
+
+                infoText.textContent =
+
+                    "KURT → ROTATE " +
+                    activeAxes.join(" + ");
+
+            }
+
+
+            /* =============================================
+               SCALE
+            ============================================== */
+
+            else if (
+
+                currentTool === "scale"
+
+            ) {
+
+                const scale =
+                    THREE.MathUtils.clamp(
+
+                        1.8 -
+                        hand[8].y * 2,
+
+                        .25,
+                        3
+
+                    );
+
+
+                selectedObject.scale.setScalar(
+                    scale
+                );
+
+
+                updateModeText();
+
+
+                infoText.textContent =
+                    "EL → MODEL SCALE";
+
+            }
+
+        }
+
+
+        /* =================================================
+           FACE MODE
+        ================================================= */
+
+        if (
+
+            editMode === "face" &&
+            selectedFace &&
+            selectedFace.mesh
+
+        ) {
+
+            const mesh =
+                selectedFace.mesh;
+
+
+            const faceIndex =
+                selectedFace.faceIndex;
+
+
+            /* =============================================
+               FACE MOVE
+            ============================================== */
+
+            if (
+
+                currentTool === "move" &&
+                isPinch
+
+            ) {
+
+                transformFace(
+
+                    mesh,
+
+                    faceIndex,
+
+                    "move",
+
+                    (0.5 - hand[8].x) *
+                    .02,
+
+                    (0.5 - hand[8].y) *
+                    .02
+
+                );
+
+
+                updateModeText();
+
+
+                infoText.textContent =
+                    "PINCH → GERÇEK FACE TAŞINIYOR";
+
+            }
+
+
+            /* =============================================
+               FACE ROTATE
+            ============================================== */
+
+            else if (
+
+                currentTool === "rotate" &&
+                wolf
+
+            ) {
+
+                const axes =
+                    getRotationAxes();
+
+
+                const dx =
+                    (0.5 - hand[8].x) *
+                    .08;
+
+
+                const dy =
+                    (0.5 - hand[8].y) *
+                    .08;
+
+
+                /*
+                    Face transform fonksiyonuna
+                    X/Y hareketini gönderiyoruz.
+
+                    Hangi eksenlerin kullanılacağı
+                    checkboxlardan belirleniyor.
+                */
+
+                let finalDX =
+                    0;
+
+
+                let finalDY =
+                    0;
+
+
+                if (
+                    axes.y ||
+                    axes.z
+                ) {
+
+                    finalDX =
+                        dx;
+
+                }
+
+
+                if (
+                    axes.x
+                ) {
+
+                    finalDY =
+                        dy;
+
+                }
+
+
+                transformFace(
+
+                    mesh,
+
+                    faceIndex,
+
+                    "rotate",
+
+                    finalDX,
+
+                    finalDY
+
+                );
+
+
+                updateModeText();
+
+
+                const activeAxes = [];
+
+
+                if (axes.x)
+                    activeAxes.push("X");
+
+
+                if (axes.y)
+                    activeAxes.push("Y");
+
+
+                if (axes.z)
+                    activeAxes.push("Z");
+
+
+                infoText.textContent =
+
+                    "FACE → ROTATE " +
+                    activeAxes.join(" + ");
+
+            }
+
+
+            /* =============================================
+               FACE SCALE
+            ============================================== */
+
+            else if (
+
+                currentTool === "scale"
+
+            ) {
+
+                transformFace(
+
+                    mesh,
+
+                    faceIndex,
+
+                    "scale",
+
+                    (0.5 - hand[8].y) *
+                    .04,
+
+                    0
+
+                );
+
+
+                updateModeText();
+
+
+                infoText.textContent =
+                    "FACE → SCALE";
+
+            }
+
+        }
+
+    }
+
+);
+
+
+/* =====================================================
+   WEBCAM
+===================================================== */
+
+const webcam =
+    new Camera(
+
+        video,
+
+        {
+
+            onFrame:
+                async () => {
+
+                    await hands.send({
+
+                        image:
+                            video
+
+                    });
+
+                },
+
+            width:
+                1280,
+
+            height:
+                720
+
+        }
+
+    );
+
+
+webcam.start();
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+window.addEventListener(
+
+    "keydown",
+
+    event => {
+
+
+        const key =
+            event.key.toLowerCase();
+
+
+        /* =============================================
+           TAB
+        ============================================== */
+
+        if (
+            key === "tab"
+        ) {
+
+            event.preventDefault();
+
+
+            if (
+                editMode === "object"
+            ) {
+
+                enterFaceMode();
+
+            }
+
+            else {
+
+                enterObjectMode();
+
+            }
+
+
+            return;
+
+        }
+
+
+        /* =============================================
+           G
+        ============================================== */
+
+        if (
+            key === "g"
+        ) {
+
+            setTool(
+                "move"
+            );
+
+        }
+
+
+        /* =============================================
+           R
+        ============================================== */
+
+        if (
+            key === "r"
+        ) {
+
+            setTool(
+                "rotate"
+            );
+
+        }
+
+
+        /* =============================================
+           S
+        ============================================== */
+
+        if (
+            key === "s"
+        ) {
+
+            setTool(
+                "scale"
+            );
+
+        }
+
+
+        /* =============================================
+           DELETE
+        ============================================== */
+
+        if (
+            event.key === "Delete"
+        ) {
+
+            document
+                .getElementById(
+                    "deleteButton"
+                )
+                .click();
+
+        }
+
+    }
+
+);
+
+
+/* =====================================================
+   ANIMATION
+===================================================== */
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    /*
+        Ring.
+    */
+
+    ring.rotation.z +=
+        .01;
+
+
+    /*
+        Face overlays.
+    */
+
+    if (
+        editMode === "face"
+    ) {
+
+        updateFaceOverlays();
+
+    }
+
+
+    renderer.render(
+
+        scene,
+
+        camera3D
+
+    );
+
+}
+
+
+animate();
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+
+    "resize",
+
+    () => {
+
+        camera3D.aspect =
+
+            window.innerWidth /
+            window.innerHeight;
+
+
+        camera3D.updateProjectionMatrix();
+
+
+        renderer.setSize(
+
+            window.innerWidth,
+            window.innerHeight
+
+        );
+
+    }
+
+);
+
+
+/* =====================================================
+   START
+===================================================== */
+
+setTool(
+    "move"
+);
+
+
+setTimeout(
+
+    () => {
+
+        loading.style.display =
+            "none";
+
+    },
+
+    1800
+
+);
+
+
+/* =====================================================
+   DEBUG
+===================================================== */
+
+window.JARVIS =
+{
+
+    scene,
+
+    objects,
+
+    get selectedObject() {
+
+        return selectedObject;
+
+    },
+
+    get selectedFace() {
+
+        return selectedFace;
+
+    },
+
+    getMeshes,
+
+    enterObjectMode,
+
+    enterFaceMode,
+
+    setTool,
+
+    createFaceOverlays,
+
+    updateFaceOverlays
+
+};
+
+
+</script>
+
+</body>
+
+</html>
